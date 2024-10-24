@@ -1,0 +1,12 @@
+[build]
+    publish = "public"
+    command = "npm run build"
+    
+[functions]
+    node_bundler = "esbuild"
+    directory = "./functions"
+
+[[headers]]
+    for = "/reusable-js/*"
+    [headers.values]
+    Access-Control-Allow-Origin = "*"
