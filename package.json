@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "bimsc-knack-api": "github:damoosnz/bimsc-knack-api",
+    "bimsc-knack-interface": "github:damoosnz/bimsc-knack-interface",
     "knack-api-helper": "^2.2.4"
   },
   "devDependencies": {
