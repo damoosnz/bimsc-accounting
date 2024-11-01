@@ -6,3 +6,4 @@ const localBaseUrl = 'http://localhost:3000/'
 
 import './bimsc-financials/renders/add-transaction-render.js'
 import './bimsc-financials/renders/check-duplicates.js'
+import './bimsc-financials/renders/view-transaction-details.js'
