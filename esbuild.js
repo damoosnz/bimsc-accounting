@@ -6,7 +6,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 esbuild.build({
   entryPoints: ['index.js'], // Entry point to your project
   bundle: true, // Bundle the whole project
-  outfile: isDevelopment ? 'dist/bundle.dev.js' : 'dist/bundle.js', // Different bundle filenames for dev and prod
+  outfile: isDevelopment ? 'src/dist/bundle.dev.js' : 'src/dist/bundle.js', // Different bundle filenames for dev and prod
   format: 'esm', // Output as an ES module
   platform: 'browser', // Bundle for browser usage
   define: {

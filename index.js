@@ -2,9 +2,9 @@ import { knackApi } from "bimsc-knack-api";
 import { knackInterface } from "bimsc-knack-interface";
 import { bimscJs } from "bimsc-js-utils";
 
-import './bimsc-accounting/renders/add-transaction-render.js'
-import './bimsc-accounting/renders/check-duplicates.js'
-import './bimsc-accounting/renders/update-transaction-types.js'
-import './bimsc-accounting/renders/view-transaction-details.js'
-import './bimsc-accounting/renders/populate-transations-info.js'
+import './src/renders/add-transaction-render.js'
+import './src/renders/check-duplicates.js'
+import './src/renders/update-transaction-types.js'
+import './src/renders/view-transaction-details.js'
+import './src/renders/populate-transations-info.js'
 
