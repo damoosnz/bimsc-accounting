@@ -1,5 +1,23 @@
 {
   "dependencies": {
-    "knack-api-helper": "^2.2.4"
-  }
+    "bimsc-js-utils": "github:damoosnz/bimsc-js-utils",
+    "bimsc-knack-api": "github:damoosnz/bimsc-knack-api",
+    "bimsc-knack-interface": "github:damoosnz/bimsc-knack-interface"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.24.0"
+  },
+  "name": "bimsc-admin",
+  "description": "1. Clone this repo to a new github repo in your own account (eg download zipped files & upload to github) 2. Create a new Netlify project via the Web interface of Netlify.com 3. Configure the Netlify project to auto-deploy from the new github repo 4. Wait for first deploy to finish 5. In Netlify web interface:     1. Change site URL as desired     2. Add environment variable of your Knack application ID named `KNACK_APPLICATION_ID` (leaving all values default) 6. `./knack-builder-code/knack-js-area-code-EXAMPLE.js`      1. Rename to `knack-js-area-code.js`     2. Change line 19 (url of 2nd script import) to the URL of your Netlify project (`url: \"https://YOUR-PROJECT.netlify.app/reusable-js/knack-index.mjs\",` -> `url: \"https://YOUR-ACTUAL-PROJECT-URL.netlify.app/reusable-js/knack-index.mjs\",`)     3. Save & commit (no need to push to github for now)     4. Copy to your Knack app javascript area and save 7. in `./public/reusable-js/knack-index.mjs`      1. Change line 3 `const netlifyBaseUrl =....` to your Netlify base url eg `'https://knack-netlify-demo.netlify.app'`     2. Save the file & commit (no need to push to github yet) 8. In `./functions/example.js`      1. change line 7 `const sceneToFetchFrom...` and line 8 `const viewToFetchFrom...` to a scene and view of a GRID view on a LOGIN-PROTECTED page in your Knack app (for view-based get request when you test that function)        * Important: this scene and view must be on a login protected page!     3. Save & commit 9. Push all changes to github 10. Wait for new Netlify deploy to finish 11. Login to your Knack app, then reload your Knack app with the browser console open. You should see the following outputs if everything worked correctly. These outputs correspond to all the console.logs in `knack-index.mjs`",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  "build:dev": "cross-env NODE_ENV=development node esbuild.js",
+  "build:prod": "cross-env NODE_ENV=production node esbuild.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
