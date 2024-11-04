@@ -1,7 +1,7 @@
 // import { knackInterface } from 'https://damoosnz.github.io/bimsc-knack-interface/dist/bundle.js'
-import { knackInterface } from 'bimsc-knack-interface';
+// import { knackInterface } from 'bimsc-knack-interface';
 // import { knackApi } from 'https://cdn.jsdelivr.net/gh/damoosnz/bimsc-knack-api@latest/dist/bundle.js';
-import { knackApi } from 'bimsc-knack-api';
+// import { knackApi } from 'bimsc-knack-api';
 
 // scene_26 view_45
 
