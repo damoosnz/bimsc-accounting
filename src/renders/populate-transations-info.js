@@ -33,5 +33,7 @@ $(document).on('knack-view-render.view_38', async function (event, view, data) {
 
     }
 
+    console.log('test autorebuild')
+
 
 });

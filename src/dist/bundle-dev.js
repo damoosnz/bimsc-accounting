@@ -1743,6 +1743,7 @@ $(document).on("knack-view-render.view_38", async function(event, view2, data) {
   console.log("tr_types", tr_types);
   if (unPro_trs.length > 0) {
   }
+  console.log("test autorebuild");
 });
 
 // index.js

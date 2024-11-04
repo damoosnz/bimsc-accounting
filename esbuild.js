@@ -55,6 +55,8 @@ async function serve() {
 
   try {
     const context = await esbuild.context(contextOptions);
+    const watch = await context.watch()
+    console.log('watching...')
     const server = await context.serve(serverOptions);
     console.log(`Development server is running at http://localhost:${serverOptions.port}`);
   } catch (error) {
