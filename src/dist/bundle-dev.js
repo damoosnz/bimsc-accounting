@@ -1691,31 +1691,166 @@ function checkForDuplicates(records2) {
   return duplicateRecords;
 }
 
+// src/const/transaction_type-map.js
+var tr_types_map = [
+  {
+    bank: "WESTPAC",
+    type: "",
+    party: ["Other Party"],
+    details: ["Particulars", "Analysis (Code)", "Reference"]
+  },
+  {
+    bank: "WISE",
+    type: "TRANSFER",
+    party: ["details.recipient.name"],
+    details: ["details.description", "details.paymentReference"]
+  },
+  {
+    bank: "WISE",
+    type: "MONEY_ADDED",
+    party: ["exchangeDetails.fromAmount.currency", "exchangeDetails.toAmount.currency"],
+    details: [
+      "details.description",
+      "exchangeDetails.fromAmount.currency",
+      "exchangeDetails.fromAmount.value",
+      "exchangeDetails.toAmount.currency",
+      "exchangeDetails.toAmount.value"
+    ]
+  },
+  {
+    bank: "WISE",
+    type: "DEPOSIT",
+    party: ["details.senderName"],
+    details: ["details.description", "details.senderAccount", "details.paymentReference"]
+  },
+  {
+    bank: "WISE",
+    type: "CARD",
+    party: ["details.merchant.name"],
+    details: ["details.description", "details.category"]
+  },
+  {
+    bank: "WISE",
+    type: "CONVERSION",
+    party: ["details.description"],
+    details: [
+      "details.description",
+      "details.sourceAmount.value",
+      "details.sourceAmount.currency",
+      "details.targetAmount.value",
+      "details.targetAmount.currency",
+      "details.rate"
+    ]
+  },
+  {
+    bank: "WISE",
+    type: "ACCRUAL_CHARGE",
+    party: ["details.description"],
+    details: ["details.description", "amount.value", "amount.currency"]
+  }
+];
+
 // src/renders/update-transaction-types.js
 $(document).on("knack-view-render.view_55", async function(event, view2, data) {
-  const payload_1 = knackApi.payloads.getMany("scene_31", "view_53");
-  const tr_types = await knackApi.calls.getMany(payload_1);
-  console.log("tr_types", tr_types);
-  const payload_2 = knackApi.payloads.getMany("scene_31", "view_52");
-  const unPro_trs = await knackApi.calls.getMany(payload_2);
-  console.log("unPro_trs", unPro_trs);
-  const new_tr_types = listUniqueTrTypes(unPro_trs);
-  console.log("new_tr_types", new_tr_types);
+  const payload_1 = knackApi2.payloads.getMany("scene_31", "view_53");
+  const extg_tr_types = await knackApi2.calls.getMany(payload_1);
+  console.log("tr_types", extg_tr_types);
+  const payload_2 = knackApi2.payloads.getMany("scene_31", "view_52");
+  const unPro_trs = await knackApi2.calls.getMany(payload_2);
+  const unique_tr_types = listUniqueTrTypes(unPro_trs);
+  const new_tr_types = listNewTrTypes(extg_tr_types, unique_tr_types);
   if (new_tr_types.length > 0) {
-    const payload_3 = knackApi.payloads.postMany("scene_31", "view_54", new_tr_types);
-    const added_tr_types = await knackApi.calls.postMany(payload_3);
+    const pck_new_tr_types = packageNewTrTypes(new_tr_types);
+    const payload_3 = knackApi2.payloads.postMany("scene_31", "view_54", pck_new_tr_types);
+    const added_tr_types = await knackApi2.calls.postMany(payload_3);
   }
+  const filters3 = knackApi2.filters.create("AND");
+  const rule = { field: "field_233", operator: "is blank" };
+  filters3.rules.push(rule);
+  const payload_4 = knackApi2.payloads.getMany("scene_31", "view_53", filters3);
+  const to_config_tr_types = await knackApi2.calls.getMany(payload_4);
+  console.log("to_config_tr_types", to_config_tr_types);
+  const config_tr_types = configTrTypes(to_config_tr_types);
+  console.log("config_tr_types", config_tr_types);
+  const payload_5 = knackApi2.payloads.putMany("scene_31", "view_53", config_tr_types);
+  const upd_config_tr_types = await knackApi2.calls.putMany(payload_5);
 });
 function listUniqueTrTypes(records2) {
   const uniqueTrTypes = records2.reduce((acc, rec) => {
     const type = rec.field_176_raw;
-    const bank = rec.field_229_raw[0]?.id;
-    if (!acc.some((item) => item.field_231 + item.field_232 === type + bank)) {
-      acc.push({ field_231: type, field_232: rec.field_229_raw[0]?.id });
+    const bankId = rec.field_229_raw[0]?.id;
+    if (!acc.some(
+      (item) => item.field_231_raw === type && // compare transaction type
+      item.field_232_raw[0]?.id === bankId
+    )) {
+      acc.push({
+        field_231_raw: type,
+        field_232_raw: [{ id: bankId }]
+        // correctly structure field_232_raw as an array
+      });
     }
     return acc;
   }, []);
   return uniqueTrTypes;
+}
+function listNewTrTypes(extg_tr_types, uniq_tr_types) {
+  const new_tr_types = uniq_tr_types.filter((typ) => {
+    return !extg_tr_types.some(
+      (extg_typ) => typ.field_232_raw[0]?.id === extg_typ.field_232_raw[0]?.id && typ.field_231_raw === extg_typ.field_231_raw
+    );
+  });
+  return new_tr_types;
+}
+function packageNewTrTypes(new_tr_types) {
+  const pck_new_tr_types = new_tr_types.map(
+    (typ) => {
+      return {
+        field_231: typ.field_231_raw,
+        field_232: typ.field_232_raw[0]?.id
+      };
+    }
+  );
+  return pck_new_tr_types;
+}
+function configTrTypes(to_config_tr_types) {
+  const result = [];
+  for (let typ of to_config_tr_types) {
+    const bank = typ.field_232_raw[0]?.identifier;
+    const type = typ.field_231_raw;
+    const mapping = tr_types_map.find(
+      (item) => item.bank === bank.toUpperCase() && item.type === type
+    );
+    console.log("mapping", mapping);
+    if (mapping) {
+      result.push({
+        id: typ.id,
+        field_233: JSON.stringify(
+          {
+            party: mapping.party,
+            details: mapping.details
+          }
+        )
+      });
+    } else {
+      const defaultMapping = tr_types_map.find(
+        (item) => item.bank === bank.toUpperCase() && item.type === ""
+      );
+      if (defaultMapping) {
+        result.push({
+          id: typ.id,
+          field_233: JSON.stringify(
+            {
+              party: defaultMapping.party,
+              details: defaultMapping.details
+            }
+          )
+        });
+      } else {
+        console.warn(`No mapping found for bank: ${bank}, type: ${type}`);
+      }
+    }
+  }
+  return result;
 }
 
 // src/renders/view-transaction-details.js
@@ -1735,16 +1870,53 @@ function displayReadableJson(view2, field) {
 
 // src/renders/populate-transations-info.js
 $(document).on("knack-view-render.view_38", async function(event, view2, data) {
-  const payload_1 = knackApi.payloads.getMany("scene_30", "view_50");
-  const unPro_trs = await knackApi.calls.getMany(payload_1);
-  console.log("unPro_trs", unPro_trs);
-  const payload_2 = knackApi.payloads.getMany("scene_31", "view_53");
-  const tr_types = await knackApi.calls.getMany(payload_2);
-  console.log("tr_types", tr_types);
+  const payload_1 = knackApi2.payloads.getMany("scene_30", "view_50");
+  const unPro_trs = await knackApi2.calls.getMany(payload_1);
+  const payload_2 = knackApi2.payloads.getMany("scene_31", "view_53");
+  const tr_types = await knackApi2.calls.getMany(payload_2);
+  const pro_trs = [];
   if (unPro_trs.length > 0) {
+    for (const tr of unPro_trs) {
+      const tr_type = tr_types.find(
+        (typ) => tr.field_229_raw[0].identifier === typ.field_232_raw[0].identifier && tr.field_176_raw === typ.field_231_raw
+      );
+      console.log("tr_type", tr_type);
+      if (tr_type) {
+        const tr_config = JSON.parse(tr_type.field_233_raw);
+        const pro_tr = processData(JSON.parse(tr.field_228), tr_config);
+        pro_tr.id = tr.id;
+        pro_trs.push(pro_tr);
+      } else {
+        console.warn("Transaction type not found for:", tr);
+      }
+    }
   }
-  console.log("test autorebuild");
+  const pck_pro_trs = packageProTrs(pro_trs);
+  console.log("pck_pro_trs", pck_pro_trs);
+  const payload_3 = knackApi2.payloads.putMany("scene_30", "view_57", pck_pro_trs);
+  const upd_pro_trs = await knackApi2.calls.putMany(payload_3);
+  console.log(upd_pro_trs);
 });
+function getNestedValue(obj, path) {
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+}
+function processData(jsonData, config) {
+  const party = config.party.map((field) => getNestedValue(jsonData, field)).filter(Boolean).join(" to ");
+  const details = config.details.map((field) => getNestedValue(jsonData, field)).filter(Boolean).join(" ");
+  return {
+    party,
+    details
+  };
+}
+function packageProTrs(pro_trs) {
+  return pro_trs.map((tr) => {
+    return {
+      id: tr.id,
+      field_235: tr.party,
+      field_236: tr.details
+    };
+  });
+}
 
 // index.js
 window.knackApi = knackApi2;

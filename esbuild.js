@@ -46,7 +46,7 @@ async function serve() {
 
   const serverOptions = {
     servedir: 'src/dist', // Directory to serve files from
-    port: 8888, // Port number
+    port: 3001, // Port number
     onRequest: (args) => {
       args.res.setHeader('Access-Control-Allow-Origin', '*')
     },

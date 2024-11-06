@@ -1,5 +1,3 @@
-// import { bimscJs } from 'https://damoosnz.github.io/bimsc-js-utils/dist/bundle.js'
-// import { bimscJs } from "bimsc-js-utils";
 
 $(document).on('knack-view-render.view_45', function (event, view, records) {
     displayReadableJson(view,'field_228')
