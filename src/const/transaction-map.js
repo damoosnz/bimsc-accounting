@@ -15,8 +15,7 @@ export const tr_types_map = [
         bank: 'WISE',
         type: 'MONEY_ADDED',
         party: ["exchangeDetails.fromAmount.currency", "exchangeDetails.toAmount.currency"],
-        details: ["details.description", "exchangeDetails.fromAmount.currency", "exchangeDetails.fromAmount.value",
-            "exchangeDetails.toAmount.currency", "exchangeDetails.toAmount.value"]
+        details: ["details.description", "exchangeDetails.fromAmount.currency", "exchangeDetails.fromAmount.value", "exchangeDetails.toAmount.currency", "exchangeDetails.toAmount.value"]
     },
     {
         bank: 'WISE',
@@ -34,8 +33,7 @@ export const tr_types_map = [
         bank: 'WISE',
         type: 'CONVERSION',
         party: ["details.description"],
-        details: ["details.description", "details.sourceAmount.value", "details.sourceAmount.currency",
-            "details.targetAmount.value", "details.targetAmount.currency", "details.rate"]
+        details: ["details.description", "details.sourceAmount.value", "details.sourceAmount.currency", "details.targetAmount.value", "details.targetAmount.currency", "details.rate"]
     },
     {
         bank: 'WISE',
@@ -44,6 +42,13 @@ export const tr_types_map = [
         details: ["details.description", "amount.value", "amount.currency"]
     },
 ]
+
+export const tr_bank_map = {
+    WESTPAC: "Transaction Type",
+    WISE: "details.type"
+}
+
+
 
 // const temp = {
 //     "type": "DEBIT",
@@ -81,4 +86,25 @@ export const tr_types_map = [
 //     "referenceNumber": "FEE-BALANCE-82243053",
 //     "attachment": null, "activityAssetAttributions": []
 // }
+
+const wpTemp = {
+    "Account Number": "0307130019713000",
+    "Date": {
+        "date": "29/12/2016",
+        "hours": "12",
+        "minutes": "00",
+        "am_pm": "AM"
+    },
+    "Amount": "14553.92",
+    "Transaction Code": "",
+    "Transaction Type": "CREDIT",
+    "Source": "",
+    "Other Party": "Asian Engineering Se",
+    "Particulars": "As Per Instr",
+    "Analysis (Code)": "NZD1455392",
+    "Reference": "GP0008291037",
+    "Serial Number": "",
+    "Account Code": "",
+    "Unique ID": "0307130019713000_201612290001"
+}
 
