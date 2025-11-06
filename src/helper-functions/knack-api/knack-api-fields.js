@@ -1,80 +1,52 @@
-// map of the knack fields to ma code more readable and replace the field_key by a field label in code
-
-
 const fields = {
-    jobs: {
-        uid_329: 'field_329',
-        date_338: 'field_338',
-        startDate: 'field_2298',
-        endDate: 'field_2300',
-        year_1155: 'field_1155',
-        month_1154: 'field_1154',
-        site_510: 'field_510',
-        prestUser_538: 'field_538',
-        prixHT_655: 'field_655',
-        prixTTC_1274: 'field_1274',
-        hrRate_1940: 'field_1940',
-        tva_1842: 'field_1842',
-        numHrs_343: 'field_343',
-        statusNum_641: 'field_641',
-        domaine_149: 'field_149'
+    currencies: {
+        code_5: 'field_5',
     },
-    sites: {
-        uid: 'field_1038',
-        reqDip: "field_2267",
+    fy: {
+        year_18: 'field_18',
+        startDate_20: 'field_20',
+        endDate_21: 'field_21'
     },
-    jobCats: {
-        uid: 'field_1189',
-        dipReq: 'field_2219',
+    profiles: {
+        id_263: 'field_263',
+        name_264: 'field_264',
+        ref_265: 'field_265'
     },
-    pu: {
-        uid: 'field_953',
-        dipAct: 'field_2224',
-        attVig: 'field_2341',
-        bankModif_2730: 'field_2730',
+    accounts: {
+        profile_274: 'field_274',
+        currency_168: 'field_168',
+        id_266: 'field_266',
+        ref_279: 'field_279',
     },
-    quals: {
-        uid: 'field_1552',
-        act: 'field_2212',
-        app: 'field_702',
-        qualCat: 'field_2211',
+    trTypes: {
+        type_231: 'field_231'
     },
-    qualCats: {
-        uid: 'field_2175',
-        actMul: 'field_2682',
-        expMul: 'field_2222',
-        name: 'field_2174',
+    trParties: {
+        name_239: 'field_239',
+        hash_255: 'field_255'
     },
-    recaps: {
-        period_1021: 'field_1021'
+    trCategories: {
+        code_244: 'field_244',
+        name_245: 'field_245',
+        hints_289: 'field_289',
     },
-    recapBatches: {
-        iteration_2510: 'field_2510'
-    },
-    recapItems: {
-        uid_1023: 'field_1023',
-        recap_1024: 'field_1024',
-        batch_2537: 'field_2537',
-        jobs_2182: 'field_2182',
-        prestUser_1025: 'field_1025',
-        site_1026: 'field_1026',
-        invNum_1028: 'field_1028',
-        totalHT: 'field_1033',
-        avgTVA: 'field_1034',
-        totalTTC: 'field_1035',
-        jobsCount: 'field_1037',
-        jobsList: 'field_1114',
-        hrRate: 'field_2137',
-        totalHrs: 'field_2178',
-        marker: 'field_2412',
-    },
-    siteActPu: {
-        statusNum_2451: 'field_2451',
-        lastRun_2449: 'field_2449',
-        prestUsers_2464: 'field_2464',
+    transactions: {
+        currency_178: 'field_178',
+        fy_237: 'field_237',
+        profile_270: 'field_270',
+        account_179: 'field_179',
+        trType_247: 'field_247',
+        trParty_248: 'field_248',
+        id_177: 'field_177',
+        date_171: 'field_171',
+        amount_172: 'field_172',
+        forex_271: 'field_271',
+        details_236: 'field_236',
+        json_228: 'field_228',
+        bank_269: 'field_269',
+        dir_181: 'field_181',
+        categories_288: 'field_288',
     }
-
-
 }
 
 function normalizeFields(obj) {
@@ -95,4 +67,3 @@ function normalizeFields(obj) {
 normalizeFields(fields)
 
 export { fields };
-

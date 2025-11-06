@@ -1,8 +1,8 @@
 import { knackApiHelperProgressCbPercent } from "./knack-api-progress-report.js";
 
-
-// Put
-export function createApiPayloadPutSingle(sceneKey, viewKey, record_id, recordData) {
+// PUT
+//  SINGLE
+function createApiPayloadPutSingle(sceneKey, viewKey, record_id, recordData) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
@@ -14,7 +14,8 @@ export function createApiPayloadPutSingle(sceneKey, viewKey, record_id, recordDa
     }
     return payload
 }
-export function createApiPayloadPutMany(sceneKey, viewKey, records, progress) {
+//  MANY
+function createApiPayloadPutMany(sceneKey, viewKey, records, progress) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
@@ -23,14 +24,17 @@ export function createApiPayloadPutMany(sceneKey, viewKey, records, progress) {
         view: viewKey,
         records: records,
     }
-    // if (progress) { payload.progressCbs: progress[0].map(callback => (progress, len, fetchResult) => callback(progress, len, fetchResult, progress[1])) }
+    if (progress) {
+        payload.progressCbs = progress
+    }
+
     return payload
 
 }
 
-
-// Post
-export function createApiPayloadPostSingle(sceneKey, viewKey, record) {
+// POST
+//  SINGLE
+function createApiPayloadPostSingle(sceneKey, viewKey, record) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
@@ -42,7 +46,8 @@ export function createApiPayloadPostSingle(sceneKey, viewKey, record) {
     return payload
 
 }
-export function createApiPayloadPostMany(sceneKey, viewKey, records) {
+//  MANY
+function createApiPayloadPostMany(sceneKey, viewKey, records) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
@@ -54,106 +59,137 @@ export function createApiPayloadPostMany(sceneKey, viewKey, records) {
     return payload
 
 }
-//get
-export function createApiPayloadGetSingle(sceneKey, viewKey, record_id) {
 
-    sceneKey = getSceneFromView(sceneKey, viewKey)
+// GET
+//  SINGLE
+// function createApiPayloadGetSingle(sceneKey, viewKey, record_id) {
+function createApiPayloadGetSingle({ s, v, r }) {
+
+    s = getSceneFromView(s, v)
 
     const payload = {
-        scene: sceneKey,
-        view: viewKey,
-        recordId: record_id,
+        scene: s,
+        view: v,
+        recordId: r,
     }
     return payload
 
 }
-export function createApiPayloadGetMany(sceneKey, viewKey, filters, parentRecord, format) {
+//  MANY
+// function createApiPayloadGetMany(sceneKey, viewKey, filters, parentRecord, format) {
+function createApiPayloadGetMany({ s, v, f, p, fmt, m }) {
 
-    sceneKey = getSceneFromView(sceneKey, viewKey)
+    s = getSceneFromView(s, v)
 
-    if (parentRecord) {
-        var url = `https://api.knack.com/v1/pages/${sceneKey}/views/${viewKey}/records?${parentRecord.name}_id=${parentRecord.id}`
-        if (filters) { // Check if filters is not empty
-            url += '&filters=' + encodeURIComponent(JSON.stringify(filters)); // Use & instead of ?
+    const payload = {
+        scene: s,
+        view: v,
+    }
+
+    if (m) {
+        payload.maxRecordsToGet = m
+    }
+
+    if (!fmt) { fmt = 'both' }
+    payload.format = fmt
+
+    if (p) {
+        // var url = `https://api.knack.com/v1/pages/${s}/views/${v}/records?${p.name}_id=${p.id}`
+        // payload.url = url
+        // payload.IsParent = true
+        // payload.parent = p
+        // if (f) { // Check if filters is not empty
+        //     url += '&filters=' + encodeURIComponent(JSON.stringify(f));
+        //     payload.filters = f
+        // }
+
+        // return payload
+        payload.sceneRecordId = p.id
+
+    }
+    // else {
+
+    // const payload = {
+    //     scene: s,
+    //     view: v,
+    // }
+    if (f) {
+        payload.filters = f
+    }
+    return payload
+
+}
+
+//  REPORT
+function createApiPayloadGetManyReport({ s, v, f }) {
+
+    s = getSceneFromView(s, v)
+
+    if (f) {
+
+        const baseUrl = `https://api.knack.com/v1/scenes/${s}/views/${v}/report/0`
+        const apiUrl = baseUrl + '?filters=' + encodeURIComponent(JSON.stringify(f));
+        return {
+            url: apiUrl,
+            isFilters: true,
+            scene: s,
+            view: v,
+            filters: f
         }
-        // console.log('params', sceneKey, viewKey, filters , parentRecord , format)
-        // console.log('payload', url)
-        return url
 
     } else {
 
-        if (!format) { format = 'both' }
-        const payload = {
-            scene: sceneKey,
-            view: viewKey,
-            format: format,
+        return {
+            scene: s,
+            view: v,
         }
-        if (filters) { payload.filters = filters }
-        // console.log('params', sceneKey, viewKey, filters , parentRecord , format)
-        // console.log('payload', payload)
-        return payload
+
     }
 }
-//delete
-export function createApiPayloadDeleteSingle(sceneKey, viewKey, record) {
+
+// DELETE
+//  SINGLE
+function createApiPayloadDeleteSingle(sceneKey, viewKey, record) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
     const payload = {
         recordId: record.id,
         scene: sceneKey,
-        view: viewKey,//view_21 is a view with a delete link like a grid or details view
+        view: viewKey,
     }
     return payload
 }
-
-//report
-export function createApiPayloadGetFromReportFilters(sceneKey, viewKey, filters = {}) {
-
-    sceneKey = getSceneFromView(sceneKey, viewKey)
-
-    if (filters) {
-
-        const baseUrl = `https://api.knack.com/v1/scenes/${sceneKey}/views/${viewKey}/report/0`
-        const apiUrl = baseUrl + '?filters=' + encodeURIComponent(JSON.stringify(filters));
-        return { url: apiUrl, filters: true }
-
-    } else {
-
-        const payload = {
-            scene: sceneKey,
-            view: viewKey,
-        }
-        return payload
-
-    }
-}
-
-function createApiPayloadGetFromReport(sceneKey, viewKey, filters = {}) {
+// MANY
+function createApiPayloadDeleteMany(sceneKey, viewKey, records) {
 
     sceneKey = getSceneFromView(sceneKey, viewKey)
 
     const payload = {
+        records,
         scene: sceneKey,
         view: viewKey,
     }
     return payload
-
 }
+
+
+
+
 
 
 
 export const knackApiPayloads = {
     // get
-    getSingle: (sceneKey, viewKey, record_id) => createApiPayloadGetSingle(sceneKey, viewKey, record_id),
-    getMany: (sceneKey, viewKey, filters, parentRecord, format) => createApiPayloadGetMany(sceneKey, viewKey, filters, parentRecord, format),
-    getFromReport: (sceneKey, viewKey) => createApiPayloadGetFromReport(sceneKey, viewKey),
-    getFromReportFilters: (sceneKey, viewKey, filters) => createApiPayloadGetFromReportFilters(sceneKey, viewKey, filters),
+    getSingle: ({ s, v, r }) => createApiPayloadGetSingle({ s, v, r }),
+    getMany: ({ s, v, f, p, fmt, m }) => createApiPayloadGetMany({ s, v, f, p, fmt, m }),
+    getManyReport: ({ s, v, f }) => createApiPayloadGetManyReport({ s, v, f }),
     // post
     postSingle: (sceneKey, viewKey, record) => createApiPayloadPostSingle(sceneKey, viewKey, record),
     postMany: (sceneKey, viewKey, records) => createApiPayloadPostMany(sceneKey, viewKey, records),
     // delete
     deleteSingle: (sceneKey, viewKey, record) => createApiPayloadDeleteSingle(sceneKey, viewKey, record),
+    deleteMany: (sceneKey, viewKey, records) => createApiPayloadDeleteMany(sceneKey, viewKey, records),
     // put
     putSingle: (sceneKey, viewKey, record_id, recordData) => createApiPayloadPutSingle(sceneKey, viewKey, record_id, recordData),
     putMany: (sceneKey, viewKey, records, progress) => createApiPayloadPutMany(sceneKey, viewKey, records, progress)
@@ -176,11 +212,6 @@ function getSceneFromView(sceneKey, viewKey) {
         console.log('api payload - scenekey MISMATCH', sceneKeyCheck, sceneKey, sceneKeyCheck === sceneKey)
         return sceneKeyCheck
     }
-
-    // using the views route
-    // [115].views.models[0].attributes.key
-    // using the attributes route
-    // [107].attributes.views[0].key
 
 }
 

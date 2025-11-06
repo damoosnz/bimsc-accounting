@@ -14,8 +14,11 @@ import { knackApiHelperProgressCbPercent } from "./knack-api/knack-api-progress-
 import { getFromPage } from "./knack-ui/getThingsFromPage.js";
 import { manipViews } from "./knack-ui/knack-object-methods.js";
 import { getViewFiltersFromUrl } from "./knack-ui/get-view-filters-from-url.js";
+import { getViewSearchFromUrl } from "./knack-ui/get-view-search-from-url.js";
 import { waitFor } from "./knack-ui/wait-for-ui-event-complete.js";
 import { getViewCustomParams } from "./knack-ui/get-views-params-from-description.js";
+import { addCounterToNavBtn } from "./knack-ui/add-counter-to-nav-btn.js";
+import { diplayViews } from "./knack-ui/view-displays.js";
 
 // pipedream
 import { pd } from "./pipedream/sendPipedreamRequest.js";
@@ -24,6 +27,10 @@ import { pd } from "./pipedream/sendPipedreamRequest.js";
 import { stripHTML } from "./generic-html/convert-html-to-string.js";
 import { chunkArray } from "./generic-js/chunk-array.js";
 import { staggeredAll } from "./generic-js/stagger-promises.js";
+import { jsonToHtml } from "./generic-html/convert-json-to-html.js";
+
+// dates 
+import { dates } from "./dates/date.js";
 
 
 
@@ -46,21 +53,25 @@ export const hf = {
         manipViews: manipViews,
         getFromUrl: {
             filters: (view, reportIndex) => getViewFiltersFromUrl(view, reportIndex),
+            search: (view) => getViewSearchFromUrl(view)
         },
         waitFor,
+        diplayViews,
         getViewCustomParams,
+        addCounterToNavBtn,
     },
     //pipedream
     pd: pd,
     // generic
     generic: {
         html: {
-            htmlToText: (html) => stripHTML(html)
+            htmlToText: (html) => stripHTML(html),
+            jsonToHtml: (string, $el) => jsonToHtml(string, $el)
         },
         js: {
             chunkArray: (array, chunkSize) => chunkArray(array, chunkSize),
             staggerAll: (promises, delayMs) => staggeredAll(promises, delayMs)
         }
-    }
-
+    },
+    dates,
 }

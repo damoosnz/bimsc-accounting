@@ -8,7 +8,7 @@ export const fasElSty = {
     }),
     $container: (es) => ({
         border: `5px solid ${es.bg}`,
-        color: es.fg,
+        // color: es.fg,
         padding: '1rem',
         borderRadius: '8px',
         boxShadow: `0 1px 6px 0 ${hexToRgba(es.bg, 0.3)}`,
@@ -26,6 +26,9 @@ export const fasElSty = {
     }),
     $icon: (es) => ({
         color: es.bg,
+    }),
+    $td: (es) => ({
+        border: `5px solid ${es.bg}`,
     })
 }
 

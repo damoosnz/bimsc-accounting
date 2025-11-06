@@ -1,4 +1,5 @@
 import { getViewFiltersFromUrl } from "./get-view-filters-from-url.js";
+import { hf } from "../helper-functions.js";
 
 export function addFilterToTableView(view, newFilters) {
 
@@ -77,8 +78,36 @@ export function addFilterToTableView(view, newFilters) {
 
 }
 
+function resetFiltersTableView(view, newFilters) {
+
+    if (!newFilters || !newFilters.match || newFilters.rules?.length === 0) {
+        console.log('newFilters not correctly formatted')
+        return
+    }
+    Knack.views[view.key].handleChangeFilters(newFilters);
+
+}
+
+function removeFiltersTableVIew(view) {
+    Knack.views[view.key].handleChangeFilters({});
+}
+
+function normalizeFiltersTableView(view) {
+
+    const defaultfilters = getViewFiltersFromUrl(view)
+    const isArr = defaultfilters && Array.isArray(defaultfilters)
+    if (isArr) {
+        const normalisedFilters = hf.knAPI.filters.create('and')
+        normalisedFilters.rules = defaultfilters
+        Knack.views[view.key].handleChangeFilters(normalisedFilters)
+        return true
+    }
+    return false
+
+}
+
 export function reRenderTableOrCalendar(viewKey) {
-    var originalFilters = JSON.stringify(Knack.views[viewKey].getFilters());
+    var originalFilters = Knack.views[viewKey].getFilters();
     Knack.views[viewKey].handleChangeFilters(originalFilters)
 }
 
@@ -88,6 +117,10 @@ export function reRenderDetailsView(viewKey) {
         Knack.views[viewKey].render();//re-render
         Knack.views[viewKey].postRender();//fix display issues
     }, 1000);
+}
+
+export function reRenderFormView(viewKey) {
+    Knack.views[viewKey].render();
 }
 
 function getUniqueRules(rules1, rules2) {
@@ -106,7 +139,12 @@ function getUniqueRules(rules1, rules2) {
 }
 
 export const manipViews = {
+    getViewFiltersFromUrl,
     addFiltersToTab: (view, newFilter) => addFilterToTableView(view, newFilter),
+    resetFiltersTab: (view, filters) => resetFiltersTableView(view, filters),
+    normalizeFiltersTab : (view) => normalizeFiltersTableView(view),
+    removeFilters: (view) => removeFiltersTableVIew(view),
     renderTabOrCal: (viewKey) => reRenderTableOrCalendar(viewKey),
-    renderDet: (viewKey) => reRenderDetailsView(viewKey)
+    renderDet: (viewKey) => reRenderDetailsView(viewKey),
+    renderForm: (viewKey) => reRenderFormView(viewKey),
 }
