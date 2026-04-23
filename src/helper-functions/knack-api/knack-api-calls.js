@@ -1,7 +1,8 @@
-import KnackAPI from 'https://cdn.skypack.dev/knack-api-helper@3.0.0'
+import KnackAPI from 'https://esm.sh/knack-api-helper@3.0.0'
 import { _fetch } from './fetch.js'
 import { fields } from './knack-api-fields.js';
 import { netlify } from '../netlify/netlify-request.js';
+import { chunkArray } from '../generic-js/chunk-array.js';
 
 const log = false
 
@@ -175,7 +176,8 @@ export async function knackApiViewPutMany(payload, log = false) {
     const knackAPI = newKnackApi()
     logger.started()
     try {
-        const responses = await knackAPI.putMany(payload);
+        if (payload.records.length === 0) return null
+        const responses = await chunkPutMany(knackAPI, payload);
         if (responses.summary.rejected > 0) {
             const total = responses.summary.rejected + responses.summary.fulfilled
             const failed = responses.summary.rejected
@@ -286,21 +288,18 @@ function createApiLogger(callType, callId, log, payload) {
         //   const sceneName = currentScene.attributes.name;
         //   const sceneBuilderUrl = `https://builder.knack.com/${Knack.account.name}/${Knack.app.attributes.slug}/pages/${sceneKey}`;
 
+        // const rec = {}
+        // rec[fields.apiErr.callType_2797.key] = callType
+        // rec[fields.apiErr.callOrigin_2839.key] = origin
+        // rec[fields.apiErr.callErr_2840.key] = err?.message || String(err)
+        // rec[fields.apiErr.callUrl_2841.key] = window.location.href
+        // rec[fields.apiErr.callUser_2795.key] = Knack.session.user.id
+        // if (payload) {
+        //     rec[fields.apiErr.callPayload_2842.key] = JSON.stringify(payload)
+        // }
 
-
-
-        const rec = {}
-        rec[fields.apiErr.callType_2797.key] = callType
-        rec[fields.apiErr.callOrigin_2839.key] = origin
-        rec[fields.apiErr.callErr_2840.key] = err?.message || String(err)
-        rec[fields.apiErr.callUrl_2841.key] = window.location.href
-        rec[fields.apiErr.callUser_2795.key] = Knack.session.user.id
-        if (payload) {
-            rec[fields.apiErr.callPayload_2842.key] = JSON.stringify(payload)
-        }
-
-        const req = netlify('POST', 'api-error', rec)
-        const resRaw = fetch(req.url, req.request)
+        // const req = netlify('POST', 'api-error', rec)
+        // const resRaw = fetch(req.url, req.request)
 
     }
 
@@ -363,6 +362,32 @@ function knackFetchReq(method, url, retries = 5) {
         retries,
     }
 
+}
+
+async function chunkPutMany(knackAPI, pl) {
+    const recs = pl.records
+    // chunk the array
+    const chunks = chunkArray(recs, 100)
+    // init the response object
+    let res = []
+    res.settings = { scene: '', view: '', records: [] }
+    res.summary = { fulfilled: 0, rejected: 0, errors: [] }
+    // process the chunk arrays
+    for (const ch of chunks) {
+        const chPl = { ...pl, records: ch }
+        const chRes = await knackAPI.putMany(chPl);
+        // push the individual result in the combined res array
+        res.push(...chRes)
+        // combine settings
+        res.settings.scene = chRes.settings.scene
+        res.settings.view = chRes.settings.view
+        res.settings.records.push(...chRes.settings.records)
+        // combine errors
+        res.summary.fulfilled += chRes.summary.fulfilled
+        res.summary.rejected += chRes.summary.rejected
+        res.summary.errors.push(...chRes.summary.errors)
+    }
+    return res
 }
 
 
