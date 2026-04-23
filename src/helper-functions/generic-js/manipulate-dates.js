@@ -1,4 +1,4 @@
-import dateFormat from 'https://cdn.skypack.dev/dateformat';
+import dateFormat from 'https://esm.sh/dateformat';
 
 export function convert_ddmmyyyy_to_yyyymmdd(dateString) {
     const [day, month, year] = dateString.split('/');
